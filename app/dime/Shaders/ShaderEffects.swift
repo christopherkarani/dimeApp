@@ -26,7 +26,7 @@ struct ShaderKeyRippleModifier: ViewModifier {
                         .float2(buttonSize),
                         .float2(touchPoint),
                         .float(elapsed),
-                        .float(0.25) // 250ms duration
+                        .float(0.25)
                     ),
                     isEnabled: rippleStart != nil && elapsed < 0.3
                 )
@@ -34,7 +34,8 @@ struct ShaderKeyRippleModifier: ViewModifier {
         }
         .onChange(of: trigger) { _ in
             rippleStart = .now
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            Task { @MainActor in
+                try? await Task.sleep(nanoseconds: 300_000_000)
                 rippleStart = nil
             }
         }
@@ -42,6 +43,7 @@ struct ShaderKeyRippleModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderKeyRipple(at point: CGPoint, trigger: Int, size: CGSize) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderKeyRippleModifier(touchPoint: point, trigger: trigger, buttonSize: size))
@@ -71,6 +73,7 @@ struct ShaderBarShimmerModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderBarShimmer(progress: CGFloat) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderBarShimmerModifier(progress: progress))
@@ -100,6 +103,7 @@ struct ShaderBarShimmerHModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderBarShimmerH(progress: CGFloat) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderBarShimmerHModifier(progress: progress))
@@ -129,6 +133,7 @@ struct ShaderArcGlowModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderArcGlow(percent: Double) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderArcGlowModifier(percent: percent))
@@ -160,6 +165,7 @@ struct ShaderAreaFillModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderAreaFill(progress: CGFloat, time: Double) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderAreaFillModifier(progress: progress, time: time))
@@ -190,6 +196,7 @@ struct ShaderSwipeWarpModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderSwipeWarp(offset: CGFloat) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderSwipeWarpModifier(offset: offset))
@@ -219,6 +226,7 @@ struct ShaderDeleteVignetteModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderDeleteVignette(isConfirming: Bool) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderDeleteVignetteModifier(isConfirming: isConfirming))
@@ -264,6 +272,7 @@ struct ShaderInkRevealModifier<T: Equatable>: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderInkReveal<T: Equatable>(trigger: T) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderInkRevealModifier(trigger: trigger))
@@ -288,6 +297,7 @@ struct ShaderGrainOverlayModifier: ViewModifier {
 }
 
 extension View {
+    @ViewBuilder
     func shaderGrainOverlay(intensity: Double = 0.015) -> some View {
         if #available(iOS 17, *) {
             self.modifier(ShaderGrainOverlayModifier(intensity: intensity))
