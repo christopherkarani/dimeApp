@@ -762,8 +762,7 @@ struct SingleGraphView: View {
                         .font(.geist(.caption, weight: .medium))
                         .foregroundStyle(Color.vTertiary)
                         .textCase(.uppercase)
-                        .tracking(0.3)
-                        .layoutPriority(1)
+                                                .layoutPriority(1)
 
                     HStack(spacing: 8) {
                         InsightsDollarView(amount: totalNet, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
@@ -809,8 +808,7 @@ struct SingleGraphView: View {
                             .font(.geist(.caption, weight: .medium))
                             .foregroundStyle(Color.vTertiary)
                             .textCase(.uppercase)
-                            .tracking(0.3)
-                        InsightsDollarView(amount: incomeAverage, currencySymbol: currencySymbol, showCents: showCents)
+                                                    InsightsDollarView(amount: incomeAverage, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
                 } else {
@@ -820,8 +818,7 @@ struct SingleGraphView: View {
                             .font(.geist(.caption, weight: .medium))
                             .foregroundStyle(Color.vTertiary)
                             .textCase(.uppercase)
-                            .tracking(0.3)
-                        InsightsDollarView(amount: average, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
+                                                    InsightsDollarView(amount: average, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
                             .layoutPriority(1)
                     }
                 }
@@ -2298,12 +2295,19 @@ struct InsightsDollarView: View {
                 .font(.geist(.caption, weight: .medium))
                 .foregroundStyle(Color.vTertiary)
 
-            Text(formattedAmount)
-                .font(.geistMono(.title3, weight: .semibold))
-                .monospacedDigit()
-                .foregroundStyle(Color.vText)
-                .contentTransition(.numericText(value: amount))
-                .animation(.spring(response: 0.35, dampingFraction: 0.8), value: amount)
+            if #available(iOS 17.0, *) {
+                Text(formattedAmount)
+                    .font(.geistMono(.title3, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.vText)
+                    .contentTransition(.numericText(value: amount))
+                    .animation(.spring(response: 0.35, dampingFraction: 0.8), value: amount)
+            } else {
+                Text(formattedAmount)
+                    .font(.geistMono(.title3, weight: .semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color.vText)
+            }
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
@@ -2373,8 +2377,7 @@ struct SwipeArrowView: View {
                 .font(.geist(.caption2, weight: .medium))
                 .multilineTextAlignment(.center)
                 .foregroundStyle(changeTime ? Color.vText : Color.vMuted)
-                .tracking(0.3)
-        }
+                        }
         .drawingGroup()
     }
 }

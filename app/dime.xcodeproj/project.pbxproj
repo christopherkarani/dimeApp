@@ -476,7 +476,8 @@
 				5327D28C287C697C00F76ADF /* Preview Content */,
 				AE30A1522AE7D95200E516B3 /* Components */,
 			
-				2F0E11808A81484EBCBE76FD /* Fonts */,);
+				2F0E11808A81484EBCBE76FD /* Fonts */,
+			);
 			path = dime;
 			sourceTree = "<group>";
 		};
@@ -510,7 +511,8 @@
 				536A2A162A5A7C5D00D81E02 /* OffsetHelper.swift */,
 				533D1C3B2AE7BB6900894764 /* DynamicType.swift */,
 			
-				EF5CEF27FF4D4A468DBED2B1 /* Font+Geist.swift */,);
+				EF5CEF27FF4D4A468DBED2B1 /* Font+Geist.swift */,
+			);
 			path = Utilities;
 			sourceTree = "<group>";
 		};
@@ -925,8 +927,7 @@
 				533D1C2D2AE791F500894764 /* ShortcutsEntities.swift in Sources */,
 				5311A22C29F04EF300A5BE20 /* WidgetConfiguration.intentdefinition in Sources */,
 				5321E1E0291FE2D000D5A931 /* CategoryCreationErrors.swift in Sources */,
-			
-				A59E4E2E16A54B3CA07B41A8 /* Font+Geist.swift in Sources */,);
+			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		5313EC6228ACE941000EAB0C /* Sources */ = {
@@ -990,6 +991,7 @@
 				53A839C128D732E1006F227C /* TabBarHiding.swift in Sources */,
 				53D6BDC32AF668E700F5728E /* DetailedBudgetViewTopBarButtons.swift in Sources */,
 				53E832E52B0A2CAF000CBBA0 /* InsightsSummaryBlock.swift in Sources */,
+				A59E4E2E16A54B3CA07B41A8 /* Font+Geist.swift in Sources */,
 				5327D2C9287C6B2500F76ADF /* SupportEmail.swift in Sources */,
 				5327D2DC287C6B5F00F76ADF /* BudgetView.swift in Sources */,
 				5327D2DE287C6B5F00F76ADF /* CustomTabBar.swift in Sources */,

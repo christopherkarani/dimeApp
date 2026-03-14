@@ -23,24 +23,13 @@ struct InsightsSummaryBlockView: View {
 
     var body: some View {
         HStack(spacing: 6) {
-            Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(color)
-                .frame(width: 22, height: 22)
-                .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-                .symbolEffect(.bounce, value: bounceCount)
+            iconView
 
             Text(income ? "Income" : "Expenses")
                 .font(.geist(.caption2, weight: .medium))
                 .foregroundStyle(Color.vTertiary)
 
-            Text(amountString)
-                .font(.geistMono(.footnote, weight: .semibold))
-                .monospacedDigit()
-                .foregroundStyle(Color.vText)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
-                .contentTransition(.numericText())
+            amountView
         }
         .padding(.horizontal, 8)
         .padding(.vertical, 6)
@@ -64,6 +53,37 @@ struct InsightsSummaryBlockView: View {
                 isPressed = false
             }
             action()
+        }
+    }
+
+    @ViewBuilder
+    private var iconView: some View {
+        let base = Image(systemName: income ? "arrow.up.right" : "arrow.down.right")
+            .font(.system(size: 11, weight: .bold))
+            .foregroundStyle(color)
+            .frame(width: 22, height: 22)
+            .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+
+        if #available(iOS 17.0, *) {
+            base.symbolEffect(.bounce, value: bounceCount)
+        } else {
+            base
+        }
+    }
+
+    @ViewBuilder
+    private var amountView: some View {
+        let base = Text(amountString)
+            .font(.geistMono(.footnote, weight: .semibold))
+            .monospacedDigit()
+            .foregroundStyle(Color.vText)
+            .lineLimit(1)
+            .minimumScaleFactor(0.7)
+
+        if #available(iOS 16.0, *) {
+            base.contentTransition(.numericText())
+        } else {
+            base
         }
     }
 }
