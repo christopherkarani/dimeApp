@@ -2219,6 +2219,7 @@ struct AnimatedBarGraph: View {
 
     @AppStorage("animated", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var animated: Bool = true
     @State var showBar: Bool = false
+    @State var shimmerProgress: CGFloat = 0
 
     var body: some View {
         VStack(spacing: 0) {
@@ -2228,12 +2229,15 @@ struct AnimatedBarGraph: View {
                 .fill(Color.vText)
                 .frame(height: showBar ? nil : 0, alignment: .bottom)
         }
+        .shaderBarShimmer(progress: shimmerProgress)
         .onAppear {
             if !animated {
                 showBar = true
+                shimmerProgress = 1.0
             } else {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.75).delay(Double(index) * 0.04)) {
                     showBar = true
+                    shimmerProgress = 1.0
                 }
             }
         }
@@ -2246,6 +2250,7 @@ struct AnimatedHorizontalBarGraph: View {
     var index: Int
 
     @State var showBar: Bool = false
+    @State var shimmerProgress: CGFloat = 0
 
     var body: some View {
         HStack(spacing: 0) {
@@ -2255,12 +2260,15 @@ struct AnimatedHorizontalBarGraph: View {
 
             Spacer(minLength: 0)
         }
+        .shaderBarShimmerH(progress: shimmerProgress)
         .onAppear {
             if !animated {
                 showBar = true
+                shimmerProgress = 1.0
             } else {
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(Double(index) * 0.06)) {
                     showBar = true
+                    shimmerProgress = 1.0
                 }
             }
         }
@@ -2272,6 +2280,7 @@ struct InsightsDollarView: View {
     var currencySymbol: String
     var showCents: Bool
     var net: Bool?
+    var periodID: String = ""
 
     var symbol: String {
         if let netPositive = net {
@@ -2311,6 +2320,7 @@ struct InsightsDollarView: View {
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
+        .shaderInkReveal(trigger: periodID)
     }
 
     init(amount: Double, currencySymbol: String, showCents: Bool, net: Bool? = nil) {
