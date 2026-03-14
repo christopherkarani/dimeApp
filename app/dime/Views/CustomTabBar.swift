@@ -79,6 +79,13 @@ struct CustomTabBar: View {
         .padding(.bottom, bottomEdge - 10)
         .frame(maxWidth: .infinity)
         .background(Color.PrimaryBackground)
+        .background {
+            if #available(iOS 17, *) {
+                Rectangle()
+                    .fill(.ultraThinMaterial)
+                    .shaderGrainOverlay()
+            }
+        }
         .fullScreenCover(isPresented: $addTransaction, onDismiss: {
             if confetti {
                 if count != transactions.count {
