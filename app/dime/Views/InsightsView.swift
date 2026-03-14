@@ -43,16 +43,16 @@ struct InsightsView: View {
                     .padding(.bottom, 20)
 
                 Text("Analyse Your Expenditure")
-                    .font(.system(.title2, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.vText.opacity(0.8))
+                    .font(.geist(.title2, weight: .medium))
+                    .foregroundStyle(Color.vText.opacity(0.8))
                     .multilineTextAlignment(.center)
 
                 Text("As transactions start piling up")
-                    .font(.system(.body, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.vTertiary)
+                    .font(.geist(.body, weight: .regular))
+                    .foregroundStyle(Color.vTertiary)
                     .multilineTextAlignment(.center)
             }
-            .padding(.horizontal, 30)
+            .padding(.horizontal, 24)
             .frame(height: 250, alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.all)
@@ -63,26 +63,26 @@ struct InsightsView: View {
             VStack(spacing: 5) {
                 HStack {
                     Text("Insights")
-                        .font(.system(.title, design: .rounded).weight(.semibold))
-                        .foregroundColor(Color.vText)
-                        .accessibility(addTraits: .isHeader)
+                        .font(.geist(.title, weight: .semibold))
+                        .foregroundStyle(Color.vText)
+                        .accessibilityAddTraits(.isHeader)
                     Spacer()
 
                     Button {
                         showTimeMenu = true
                     } label: {
-                        HStack(spacing: 4.5) {
+                        HStack(spacing: 4) {
                             Text(chartTypeString)
-                                .font(.system(.body, design: .rounded).weight(.medium))
+                                .font(.geist(.subheadline, weight: .medium))
 
                             Image(systemName: "chevron.up.chevron.down")
-                                .font(.system(.caption, design: .rounded).weight(.medium))
+                                .font(.geistFixed(size: 10, weight: .medium))
                         }
-                        .padding(3)
-                        .padding(.horizontal, 6)
-                        .foregroundColor(Color.vSecondary)
-                        .background(Color.vSurface, in: RoundedRectangle(cornerRadius: 6))
-                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.vBorder, lineWidth: 1))
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 8)
+                        .foregroundStyle(Color.vSecondary)
+                        .background(Color.vSurface.opacity(0.6), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).strokeBorder(Color.vBorder.opacity(0.5), lineWidth: 0.5))
                     }
                     .popover(present: $showTimeMenu, attributes: {
                         $0.position = .absolute(
@@ -97,9 +97,9 @@ struct InsightsView: View {
                         ChartTimePickerView(showMenu: $showTimeMenu)
                     }
                 }
-                .padding(.horizontal, 30)
-                .padding(.top, 20)
-                .padding(.bottom, 20)
+                .padding(.horizontal, 24)
+                .padding(.top, 12)
+                .padding(.bottom, 8)
 
                 if chartType == 1 {
                     WeekGraphView()
@@ -209,22 +209,24 @@ struct HorizontalPieChartView: View {
 
     var body: some View {
         if !categories.isEmpty {
-            VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 6) {
                 if !categoryFilterMode {
-                    Text("Categories")
-                        .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .foregroundColor(Color.vTertiary)
+                    // Section divider
+                    Rectangle()
+                        .fill(Color.vBorder.opacity(0.3))
+                        .frame(height: 0.33)
+                        .padding(.bottom, 4)
 
                     GeometryReader { proxy in
-                        HStack(spacing: proxy.size.width * 0.015) {
+                        HStack(spacing: proxy.size.width * 0.01) {
                             ForEach(categories) { category in
                                 if category.percent < 0.005 {
                                     EmptyView()
                                 } else {
                                     AnimatedHorizontalBarGraph(category: category, index: categories.firstIndex(of: category) ?? 0)
-                                        .frame(width: (proxy.size.width * (1.0 - (0.015 * Double(categories.count - 1)))) * category.percent)
+                                        .frame(width: (proxy.size.width * (1.0 - (0.01 * Double(categories.count - 1)))) * category.percent)
                                         .onTapGesture {
-                                            withAnimation(.easeInOut) {
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                                 if categoryFilter == category.category {
                                                     selectedDate = nil
                                                     categoryFilterMode = false
@@ -241,8 +243,8 @@ struct HorizontalPieChartView: View {
                                         .opacity(categoryFilterMode ? (categoryFilter == category.category ? 1 : 0.5) : 1)
                                         .overlay {
                                             if categoryFilterMode && categoryFilter == category.category {
-                                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                                    .stroke(Color.vText, lineWidth: 1.5)
+                                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                                    .stroke(Color.vText, lineWidth: 1)
                                             }
                                         }
                                 }
@@ -250,64 +252,66 @@ struct HorizontalPieChartView: View {
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(height: 17)
-                    .padding(.bottom, 10)
+                    .frame(height: 12)
+                    .padding(.bottom, 6)
                 }
 
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 10) {
-                        ForEach(categories, id: \.self) { category in
+                    VStack(spacing: 0) {
+                        ForEach(Array(categories.enumerated()), id: \.element) { index, category in
                             if !categoryFilterMode || categoryFilter == category.category {
                                 let boxColor = category.category.income ? Color(hex: Color.colorArray[categories.firstIndex(of: category) ?? 0]) : Color(hex: category.category.wrappedColour)
 
-                                HStack(spacing: 10) {
+                                HStack(spacing: 8) {
+                                    // Color dot
+                                    Circle()
+                                        .fill(boxColor)
+                                        .frame(width: 8, height: 8)
 
-                                    Text(category.category.fullName)
-                                        .font(.system(.title3, design: .rounded).weight(.semibold))
-                                        .foregroundColor(Color.vText)
+                                    Text(category.category.wrappedName)
+                                        .font(.geist(.subheadline, weight: .medium))
+                                        .foregroundStyle(Color.vText)
+                                        .lineLimit(1)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
                                     Text("\(currencySymbol)\(category.amount, specifier: (showCents && category.amount < 100) ? "%.2f" : "%.0f")")
-                                        .font(.system(categoryFilterMode && categoryFilter == category.category ? .title3 : .body, design: .rounded).weight(.medium))
-                                        .foregroundColor(Color.vTertiary)
+                                        .font(.geistMono(.caption, weight: .medium))
+                                        .monospacedDigit()
+                                        .foregroundStyle(Color.vSecondary)
                                         .lineLimit(1)
                                         .layoutPriority(1)
 
                                     if categoryFilterMode && categoryFilter == category.category {
                                         Button {
-                                            withAnimation(.easeInOut) {
+                                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                                 selectedDate = nil
                                                 categoryFilterMode = false
                                                 categoryFilter = nil
                                             }
                                         } label: {
                                             Image(systemName: "xmark")
-                                                .font(.system(.footnote, design: .rounded).weight(.bold))
-                                                .foregroundColor(Color.vTertiary)
-                                                .padding(5)
+                                                .font(.system(size: 8, weight: .bold))
+                                                .foregroundStyle(Color.vTertiary)
+                                                .padding(4)
                                                 .background(Color.vSurface, in: Circle())
                                         }
-
                                     } else {
-
                                         Text("\(category.percent * 100, specifier: "%.0f")%")
-                                            .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                                            .foregroundColor(boxColor)
-                                            .padding(.vertical, 3)
+                                            .font(.geistMono(.caption2, weight: .medium))
+                                            .monospacedDigit()
+                                            .foregroundStyle(Color.vTertiary)
                                             .frame(width: percentWidth)
-                                            .background(boxColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                            .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(boxColor.opacity(0.3), lineWidth: 1))
                                     }
                                 }
-                                .padding(.vertical, categoryFilterMode && categoryFilter == category.category ? 10 : 5)
-                                .padding(.horizontal, categoryFilterMode && categoryFilter == category.category ? 10 : 0)
-                                .background(RoundedRectangle(cornerRadius: 12).fill(categoryFilterMode && categoryFilter == category.category ? Color.vSurface : Color.vBg))
-                                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(categoryFilterMode && categoryFilter == category.category ? Color.vBorder : Color.clear, lineWidth: 1))
-                                .fixedSize(horizontal: false, vertical: true)
+                                .padding(.vertical, categoryFilterMode && categoryFilter == category.category ? 8 : 6)
+                                .padding(.horizontal, categoryFilterMode && categoryFilter == category.category ? 8 : 0)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(categoryFilterMode && categoryFilter == category.category ? Color.vSurface : Color.clear)
+                                )
                                 .contentShape(Rectangle())
-                                .drawingGroup()
                                 .onTapGesture {
-                                    withAnimation(.easeInOut) {
+                                    withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                         if !categoryFilterMode {
                                             selectedDate = nil
                                             categoryFilterMode = true
@@ -317,12 +321,32 @@ struct HorizontalPieChartView: View {
                                         }
                                     }
                                 }
+                                // Stagger fade-in
+                                .opacity(categoryFilterMode ? 1 : 1)
+                                .transition(.asymmetric(
+                                    insertion: .opacity.combined(with: .move(edge: .top)).animation(.spring(response: 0.3, dampingFraction: 0.8).delay(Double(index) * 0.03)),
+                                    removal: .opacity
+                                ))
 
+                                // Thin divider between rows
+                                if !categoryFilterMode && categories.firstIndex(of: category) != categories.count - 1 {
+                                    Rectangle()
+                                        .fill(Color.vBorder.opacity(0.15))
+                                        .frame(height: 0.33)
+                                        .padding(.leading, 16)
+                                }
                             }
-
                         }
                     }
                 }
+                // Scroll fade at bottom
+                .mask(
+                    VStack(spacing: 0) {
+                        Color.black
+                        LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom)
+                            .frame(height: 30)
+                    }
+                )
             }
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
         }
@@ -730,27 +754,28 @@ struct SingleGraphView: View {
     }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             HStack {
-                VStack(alignment: .leading, spacing: 1.3) {
+                VStack(alignment: .leading, spacing: 2) {
                     Text(dateString)
                         .lineLimit(1)
-                        .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geist(.caption, weight: .medium))
+                        .foregroundStyle(Color.vTertiary)
+                        .textCase(.uppercase)
+                        .tracking(0.3)
                         .layoutPriority(1)
 
-                    HStack(spacing: 10) {
+                    HStack(spacing: 8) {
                         InsightsDollarView(amount: totalNet, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
                             .layoutPriority(1)
 
                         if showPercentage {
                             Text(percentageDifference)
-                                .font(.system(.footnote, design: .rounded).weight(.medium))
-                                .foregroundColor(currentNet < lastNet ? Color.vRed : Color.vGreen)
-                                .padding(3)
-                                .padding(.horizontal, 3)
-                                .background(currentNet < lastNet ? Color.vRed.opacity(0.15) : Color.vGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
-                                .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(currentNet < lastNet ? Color.vRed.opacity(0.3) : Color.vGreen.opacity(0.3), lineWidth: 1))
+                                .font(.geistMono(.caption2, weight: .medium))
+                                .foregroundStyle(currentNet < lastNet ? Color.vRed : Color.vGreen)
+                                .padding(.vertical, 2)
+                                .padding(.horizontal, 5)
+                                .background(currentNet < lastNet ? Color.vRed.opacity(0.1) : Color.vGreen.opacity(0.1), in: Capsule())
                                 .opacity(currentNet == 0 || lastNet == 0 ? 0 : 1)
                                 .lineLimit(1)
                         }
@@ -759,53 +784,57 @@ struct SingleGraphView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 if categoryFilterMode {
-                    VStack(alignment: .trailing, spacing: 1.3) {
+                    VStack(alignment: .trailing, spacing: 2) {
                         Text(selectedCategoryName)
                             .lineLimit(1)
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.vTertiary)
+                            .font(.geist(.caption, weight: .medium))
+                            .foregroundStyle(Color.vTertiary)
 
                         InsightsDollarView(amount: selectedCategoryAmount, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
                 } else if selectedDate != nil {
-                    VStack(alignment: .trailing, spacing: 1.3) {
+                    VStack(alignment: .trailing, spacing: 2) {
                         Text(selectedDateString)
                             .lineLimit(1)
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.vTertiary)
+                            .font(.geist(.caption, weight: .medium))
+                            .foregroundStyle(Color.vTertiary)
                         InsightsDollarView(amount: selectedDateAmount, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
                 } else if incomeFiltering {
-                    VStack(alignment: .trailing, spacing: 1.3) {
+                    VStack(alignment: .trailing, spacing: 2) {
                         Text(type == 3 ? (income ? "Income/Mth" : "Spent/Mth") : (income ? "Income/Day" : "Spent/Day"))
                             .lineLimit(1)
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.vTertiary)
+                            .font(.geist(.caption, weight: .medium))
+                            .foregroundStyle(Color.vTertiary)
+                            .textCase(.uppercase)
+                            .tracking(0.3)
                         InsightsDollarView(amount: incomeAverage, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
                 } else {
-                    VStack(alignment: .trailing, spacing: 1.3) {
-                        Text(type == 3 ? "AVG/MTH" : "AVG/DAY")
+                    VStack(alignment: .trailing, spacing: 2) {
+                        Text(type == 3 ? "Avg/Mth" : "Avg/Day")
                             .lineLimit(1)
-                            .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.vTertiary)
+                            .font(.geist(.caption, weight: .medium))
+                            .foregroundStyle(Color.vTertiary)
+                            .textCase(.uppercase)
+                            .tracking(0.3)
                         InsightsDollarView(amount: average, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
                             .layoutPriority(1)
                     }
                 }
             }
-            .padding(.bottom, 5)
+            .padding(.bottom, 4)
             .onTapGesture {
-                withAnimation(.easeIn(duration: 0.2)) {
+                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                     selectedDate = nil
                 }
             }
 
             if incomeTracking {
-                HStack(spacing: 11) {
+                HStack(spacing: 8) {
                     InsightsSummaryBlockView(income: true, amountString: stringGenerator(amount: totalIncome), showOverlay: income && incomeFiltering) {
                         withAnimation {
                             if incomeFiltering && income {
@@ -828,8 +857,7 @@ struct SingleGraphView: View {
                         }
                     }
                 }
-                .padding(.horizontal, 2)
-                .padding(.bottom, 13)
+                .padding(.bottom, 8)
             }
 
             if incomeFiltering {
@@ -1047,7 +1075,7 @@ struct WeekGraphView: View {
                     }
                 }
                 .contentShape(Rectangle())
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 24)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($isDragging, body: { _, state, _ in
@@ -1133,7 +1161,7 @@ struct WeekGraphView: View {
                     } else {
                         if selectedDate == nil {
                             HorizontalPieChartView(date: showingWeek, categoryFilter: $categoryFilter, categoryFilterMode: $categoryFilterMode, selectedDate: $selectedDate, chosenAmount: $chosenCategoryAmount, chosenName: $chosenCategoryName, type: .week, income: income)
-                                .padding(.horizontal, 30)
+                                .padding(.horizontal, 24)
                                 .padding(.bottom, 70)
                                 .id(refreshID1)
 
@@ -1179,7 +1207,7 @@ struct AverageLineView: View {
             PencilView(text: getAverageText(average: average))
 
             Line()
-                .stroke(Color.vTertiary, style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
+                .stroke(Color.vTertiary.opacity(0.4), style: StrokeStyle(lineWidth: 0.5, lineCap: .round, dash: [4, 3]))
                 .frame(height: 1)
                 .frame(maxWidth: .infinity)
         }
@@ -1251,41 +1279,43 @@ struct SingleWeekBarGraphView: View {
                 // axes
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
                 }
                 .frame(height: barHeight)
                 .padding(.trailing, 3)
 
                 // bars
-                HStack(spacing: 7) {
+                HStack(spacing: 6) {
                     ForEach(daysOfWeek, id: \.self) { day in
-                        VStack(spacing: 5) {
+                        VStack(spacing: 4) {
                             ZStack(alignment: .bottom) {
-                                RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(Color.vSurface)
+                                RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                    .fill(Color.vSurface.opacity(0.4))
                                     .frame(height: barHeight)
 
                                 AnimatedBarGraph(index: daysOfWeek.firstIndex(of: day) ?? 0)
                                     .frame(height: getBarHeight(point: dayDictionary[day] ?? 0, maxi: getMax))
-                                    .opacity(selectedDate == nil ? 1 : (selectedDate == day ? 1 : 0.4))
+                                    .opacity(selectedDate == nil ? 1 : (selectedDate == day ? 1 : 0.35))
                             }
+                            .scaleEffect(y: selectedDate == day ? 1.03 : 1.0, anchor: .bottom)
+                            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: selectedDate)
 
                             Text(getWeekday(day: day).prefix(1))
-                                .font(.system(size: 12, weight: .bold, design: .rounded))
-                                .foregroundColor(Color.vTertiary)
+                                .font(.geistFixed(size: 10, weight: .medium))
+                                .foregroundStyle(selectedDate == day ? Color.vText : Color.vTertiary)
                         }
-                        .opacity(day > Date.now ? 0.3 : 1)
+                        .opacity(day > Date.now ? 0.25 : 1)
                         .frame(maxWidth: .infinity)
                         .allowsHitTesting(!(day > Date.now))
                         .onTapGesture {
-                            withAnimation(.easeIn(duration: 0.2)) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 if selectedDate == day {
                                     selectedDate = nil
                                     categoryFilterMode = false
@@ -1468,7 +1498,7 @@ struct MonthGraphView: View {
                     }
                 }
                 .contentShape(Rectangle())
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 24)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($isDragging, body: { _, state, _ in
@@ -1554,7 +1584,7 @@ struct MonthGraphView: View {
                     } else {
                         if selectedDate == nil {
                             HorizontalPieChartView(date: showingMonth, categoryFilter: $categoryFilter, categoryFilterMode: $categoryFilterMode, selectedDate: $selectedDate, chosenAmount: $chosenCategoryAmount, chosenName: $chosenCategoryName, type: .month, income: income)
-                                .padding(.horizontal, 30)
+                                .padding(.horizontal, 24)
                                 .padding(.bottom, 70)
                                 .id(refreshID1)
 
@@ -1633,14 +1663,14 @@ struct SingleMonthBarGraphView: View {
                 // axes
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
 
                 }
                 .frame(height: barHeight)
@@ -1662,8 +1692,8 @@ struct SingleMonthBarGraphView: View {
                                 .overlay(alignment: .bottom) {
                                     if numberArray.contains(((daysOfMonth.firstIndex(of: day) ?? -1) + 1)) && firstDayOfMonth == 1 {
                                         Text("\((daysOfMonth.firstIndex(of: day) ?? -1) + 1)")
-                                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                                            .foregroundColor(Color.vTertiary)
+                                            .font(.geistFixed(size: 11, weight: .medium))
+                                            .foregroundStyle(Color.vTertiary)
                                             .frame(width: 20, alignment: .center)
                                             .offset(y: 20)
                                     }
@@ -1674,7 +1704,7 @@ struct SingleMonthBarGraphView: View {
                         .frame(maxWidth: .infinity)
                         .allowsHitTesting(!(day > Date.now))
                         .onTapGesture {
-                            withAnimation(.easeIn(duration: 0.2)) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 if selectedDate == day {
                                     selectedDate = nil
                                     categoryFilterMode = false
@@ -1847,7 +1877,7 @@ struct YearGraphView: View {
                     }
                 }
                 .contentShape(Rectangle())
-                .padding(.horizontal, 30)
+                .padding(.horizontal, 24)
                 .simultaneousGesture(
                     DragGesture()
                         .updating($isDragging, body: { _, state, _ in
@@ -1933,7 +1963,7 @@ struct YearGraphView: View {
                     } else {
                         if selectedDate == nil {
                             HorizontalPieChartView(date: showingYear, categoryFilter: $categoryFilter, categoryFilterMode: $categoryFilterMode, selectedDate: $selectedDate, chosenAmount: $chosenCategoryAmount, chosenName: $chosenCategoryName, type: .year, income: income)
-                                .padding(.horizontal, 30)
+                                .padding(.horizontal, 24)
                                 .padding(.bottom, 70)
                                 .id(refreshID1)
 
@@ -1989,14 +2019,14 @@ struct SingleYearBarGraphView: View {
                 // axes
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
-                        .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.vTertiary)
+                        .font(.geistMonoFixed(size: 11, weight: .regular))
+                        .foregroundStyle(Color.vTertiary)
 
                 }
                 .frame(height: barHeight)
@@ -2018,8 +2048,8 @@ struct SingleYearBarGraphView: View {
                                 .overlay(alignment: .bottom) {
                                     if numberArray.contains(((monthsOfYear.firstIndex(of: month) ?? 0) + 1)) {
                                         Text(LocalizedStringKey(monthNames[((monthsOfYear.firstIndex(of: month) ?? 0) + 1)] ?? ""))
-                                            .font(.system(size: 12, weight: .bold, design: .rounded))
-                                            .foregroundColor(Color.vTertiary)
+                                            .font(.geistFixed(size: 11, weight: .medium))
+                                            .foregroundStyle(Color.vTertiary)
                                             .frame(width: 30)
                                             .offset(y: 20)
                                     }
@@ -2030,7 +2060,7 @@ struct SingleYearBarGraphView: View {
                         .frame(maxWidth: .infinity)
                         .allowsHitTesting(!(month > Date.now))
                         .onTapGesture {
-                            withAnimation(.easeIn(duration: 0.2)) {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                                 if selectedDate == month {
                                     selectedDate = nil
                                     categoryFilterMode = false
@@ -2132,11 +2162,11 @@ struct ChartTimePickerView: View {
 
                     if time == timeframe {
                         Image(systemName: "checkmark")
-                            .font(.system(size: 14, weight: .medium))
+                            .font(.geistFixed(size: 12, weight: .medium))
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.system(size: 18, weight: .medium, design: .rounded))
+                .font(.geist(size: 15, weight: .medium))
                 .padding(5)
                 .background {
                     if time == timeframe {
@@ -2161,7 +2191,7 @@ struct ChartTimePickerView: View {
                 }
             }
         }
-        .foregroundColor(Color.vText)
+        .foregroundStyle(Color.vText)
         .padding(4)
         .frame(width: 120)
         .background(RoundedRectangle(cornerRadius: 9).fill(Color.vSurface))
@@ -2197,18 +2227,16 @@ struct AnimatedBarGraph: View {
         VStack(spacing: 0) {
             Spacer(minLength: 0)
 
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
+            RoundedRectangle(cornerRadius: 5, style: .continuous)
                 .fill(Color.vText)
                 .frame(height: showBar ? nil : 0, alignment: .bottom)
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now()) {
-                if !animated {
+            if !animated {
+                showBar = true
+            } else {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.75).delay(Double(index) * 0.04)) {
                     showBar = true
-                } else {
-                    withAnimation(.interactiveSpring(response: 0.6, dampingFraction: 0.8, blendDuration: 0.8).delay(Double(index) * 0.1)) {
-                        showBar = true
-                    }
                 }
             }
         }
@@ -2220,27 +2248,25 @@ struct AnimatedHorizontalBarGraph: View {
     var category: PowerCategory
     var index: Int
 
-    @State var showBar: Bool = true
+    @State var showBar: Bool = false
 
     var body: some View {
         HStack(spacing: 0) {
-            RoundedRectangle(cornerRadius: 6, style: .continuous)
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .fill(category.category.income ? Color(hex: Color.colorArray[index]) : Color(hex: category.category.wrappedColour))
                 .frame(width: showBar ? nil : 0, alignment: .leading)
 
             Spacer(minLength: 0)
         }
-//        .onAppear {
-//            DispatchQueue.main.asyncAfter(deadline: .now()) {
-//                if !animated {
-//                    showBar = true
-//                } else {
-//                    withAnimation(.easeInOut(duration: 0.7).delay(Double(index) * 0.5)) {
-//                        showBar = true
-//                    }
-//                }
-//            }
-//        }
+        .onAppear {
+            if !animated {
+                showBar = true
+            } else {
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.8).delay(Double(index) * 0.06)) {
+                    showBar = true
+                }
+            }
+        }
     }
 }
 
@@ -2262,17 +2288,22 @@ struct InsightsDollarView: View {
         }
     }
 
-    var body: some View {
-        HStack(alignment: .lastTextBaseline, spacing: 1.3) {
-            Group {
-                Text(symbol)
-                    .font(.system(.title3, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.vTertiary) +
+    private var formattedAmount: String {
+        String(format: showCents && amount < 100 ? "%.2f" : "%.0f", amount)
+    }
 
-                Text("\(amount, specifier: showCents && amount < 100 ? "%.2f" : "%.0f")")
-                    .font(.system(.title, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.vText)
-            }
+    var body: some View {
+        HStack(alignment: .lastTextBaseline, spacing: 1) {
+            Text(symbol)
+                .font(.geist(.caption, weight: .medium))
+                .foregroundStyle(Color.vTertiary)
+
+            Text(formattedAmount)
+                .font(.geistMono(.title3, weight: .semibold))
+                .monospacedDigit()
+                .foregroundStyle(Color.vText)
+                .contentTransition(.numericText(value: amount))
+                .animation(.spring(response: 0.35, dampingFraction: 0.8), value: amount)
         }
         .minimumScaleFactor(0.5)
         .lineLimit(1)
@@ -2304,7 +2335,7 @@ func getAverageText(average: Double) -> String {
     }
 }
 
-let barHeight = 150.0
+let barHeight = 100.0
 
 func getOffset(maxi: Int, average: Double) -> Double {
     if maxi == 0 {
@@ -2331,17 +2362,18 @@ struct SwipeArrowView: View {
     let changeTime: Bool
 
     var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: left ? "arrow.backward.circle.fill" : "arrow.forward.circle.fill")
-                .font(.system(.body, design: .rounded).weight(.medium))
-//                                        .font(.system(size: 18, weight: .medium))
-                //                                .scaleEffect(changeTime ? 1.3 : 1)
-                .foregroundColor(changeTime ? Color.vText : Color.vMuted)
+        VStack(spacing: 6) {
+            Image(systemName: left ? "chevron.left.circle.fill" : "chevron.right.circle.fill")
+                .font(.system(size: 18))
+                .foregroundStyle(changeTime ? Color.vText : Color.vMuted)
+                .scaleEffect(changeTime ? 1.1 : 1.0)
+                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: changeTime)
 
             Text(swipeString)
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
+                .font(.geist(.caption2, weight: .medium))
                 .multilineTextAlignment(.center)
-                .foregroundColor(changeTime ? Color.vText : Color.vMuted)
+                .foregroundStyle(changeTime ? Color.vText : Color.vMuted)
+                .tracking(0.3)
         }
         .drawingGroup()
     }
@@ -2351,18 +2383,18 @@ struct SwipeEndView: View {
     let left: Bool
 
     var body: some View {
-        VStack(spacing: 8) {
-            Image(systemName: left ? "eyeglasses" : "sun.haze.fill")
-                .font(.system(.title2, design: .rounded).weight(.medium))
-                .foregroundColor(Color.vTertiary)
+        VStack(spacing: 6) {
+            Image(systemName: left ? "arrow.uturn.left" : "arrow.uturn.right")
+                .font(.system(size: 16, weight: .medium))
+                .foregroundStyle(Color.vTertiary)
 
-            Text(left ? "That's all, buddy." : "Into the unknown.")
-                .font(.system(.subheadline, design: .rounded).weight(.semibold))
-                .frame(width: 90)
+            Text(left ? "That's all." : "The future.")
+                .font(.geist(.caption2, weight: .medium))
+                .frame(width: 80)
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color.vTertiary)
+                .foregroundStyle(Color.vTertiary)
         }
-        .opacity(0.8)
+        .opacity(0.6)
         .drawingGroup()
     }
 }
