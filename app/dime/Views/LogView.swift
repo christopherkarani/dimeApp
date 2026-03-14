@@ -1339,6 +1339,8 @@ struct SingleTransactionView: View {
                 }
             }
             .offset(x: offset)
+            .shaderSwipeWarp(offset: offset)
+            .shaderDeleteVignette(isConfirming: deleteConfirm)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("\(transaction.wrappedNote), \(currencySymbol)\(String(format: "%.2f", transaction.wrappedAmount)), Transaction Category: \(transaction.category?.wrappedName ?? "Unknown"), Transaction made at \(timeConverterAccessibilityLabel(date: transaction.wrappedDate))")
         }
