@@ -683,7 +683,7 @@ struct SearchView: View {
 //                        .font(.system(size: 18, weight: .medium, design: .rounded))
                 }
             }
-            
+
             ScrollView {
                 if searchQuery == "" {
                     EmptyView()
@@ -960,7 +960,7 @@ struct ListView: View {
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
-    
+
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var showExpenseOrIncomeSign: Bool = true
 
@@ -975,26 +975,29 @@ struct ListView: View {
                 let dateText = dateConverter(date: day.id ?? Date.now).uppercased()
 
                 VStack(spacing: 0) {
-                    VStack(spacing: 4) {
+                    VStack(spacing: 3) {
                         HStack {
                             Text(dateText)
+                                .font(.geist(.caption, weight: .semibold))
+                                .textCase(.uppercase)
                             Spacer()
 
                             Text(filtered.string)
+                                .font(.geistMono(.caption, weight: .medium))
+                                .monospacedDigit()
                                 .layoutPriority(1)
                         }
-                        .font(.system(.callout, design: .rounded).weight(.semibold))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                        .font(.system(size: 14, weight: .semibold, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundStyle(Color.vTertiary)
                         .accessibilityElement(children: .ignore)
                         .accessibilityLabel("\(currencySymbol)\(String(format: "%.2f", filtered.string)) was spent \(dateConverterAccessibilityLabel(date: day.id ?? Date.now))")
 
-                        Line()
-                            .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+                        Rectangle()
+                            .fill(Color.vBorder.opacity(0.3))
+                            .frame(height: 0.33)
                     }
                     .padding(.horizontal, 10)
-                    .padding(.top, 10)
+                    .padding(.top, 8)
 
                     ForEach(filtered.transactions, id: \.id) { transaction in
                         SingleTransactionView(transaction: transaction, showCents: showCents, currencySymbol: currencySymbol, currency: currency, swapTimeLabel: swapTimeLabel, future: false, showExpenseOrIncomeSign: showExpenseOrIncomeSign)
@@ -1099,7 +1102,7 @@ struct FutureListView: View {
     var currencySymbol: String {
         return Locale.current.localizedCurrencySymbol(forCurrencyCode: currency)!
     }
-    
+
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var showExpenseOrIncomeSign: Bool = true
 
@@ -1136,21 +1139,24 @@ struct FutureListView: View {
     var body: some View {
         if !transactions.isEmpty {
             VStack(spacing: 0) {
-                VStack(spacing: 4) {
+                VStack(spacing: 3) {
                     HStack {
                         Text("UPCOMING")
+                            .font(.geist(.caption, weight: .semibold))
+                            .textCase(.uppercase)
                         Spacer()
 
                         Text(totalString)
+                            .font(.geistMono(.caption, weight: .medium))
+                            .monospacedDigit()
                     }
-                    .font(.system(.callout, design: .rounded).weight(.semibold))
                     .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-//                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundColor(Color.SubtitleText)
+                    .foregroundStyle(Color.vTertiary)
                     .accessibilityElement(children: .ignore)
 
-                    Line()
-                        .stroke(Color.Outline, style: StrokeStyle(lineWidth: 1.3, lineCap: .round))
+                    Rectangle()
+                        .fill(Color.vBorder.opacity(0.3))
+                        .frame(height: 0.33)
                 }
                 .padding(.horizontal, 10)
 
@@ -1253,57 +1259,59 @@ struct SingleTransactionView: View {
                 .offset(x: 80)
                 .offset(x: max(-80, offset))
 
-            HStack(spacing: 12) {
+            HStack(spacing: 10) {
                 EmojiLogView(emoji: (transaction.category?.wrappedEmoji ?? ""),
                              colour: (transaction.category?.wrappedColour ?? "#FFFFFF"), future: future)
                     .fixedSize(horizontal: true, vertical: true)
                     .overlay(alignment: .bottomTrailing) {
                         if transaction.recurringType > 0 {
                             Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(Color.DarkIcon)
-                                .padding(3)
-                                .background(Color.SecondaryBackground, in: RoundedRectangle(cornerRadius: 6))
-                                .offset(x: 5, y: 5)
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundStyle(Color.vSecondary)
+                                .padding(2.5)
+                                .background(Color.vSurface, in: RoundedRectangle(cornerRadius: 5))
+                                .offset(x: 4, y: 4)
                         }
                     }
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(transaction.wrappedNote)
-                        .font(.system(.body, design: .rounded).weight(.medium))
+                        .font(.geist(.subheadline, weight: .medium))
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundColor(future ? Color.SubtitleText : Color.PrimaryText)
+                        .foregroundStyle(future ? Color.vTertiary : Color.vText)
                         .lineLimit(1)
 
                     Text(getSubtitle())
-                        .font(.system(.subheadline, design: .rounded).weight(.medium))
+                        .font(.geist(.caption, weight: .regular))
                         .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                        .foregroundColor(future ? Color.EvenLighterText : Color.SubtitleText)
+                        .foregroundStyle(future ? Color.vMuted : Color.vTertiary)
                         .lineLimit(1)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 if transaction.income {
                     Text(showExpenseOrIncomeSign ? "+\(transactionAmountString)" : transactionAmountString)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
+                        .font(.geistMono(.subheadline, weight: .semibold))
+                        .monospacedDigit()
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundColor(future ? Color.SubtitleText : Color.IncomeGreen)
+                        .foregroundStyle(future ? Color.vTertiary : Color.vGreen)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                         .layoutPriority(1)
 
                 } else {
                     Text(showExpenseOrIncomeSign ? "-\(transactionAmountString)" : transactionAmountString)
-                        .font(.system(.title3, design: .rounded).weight(.medium))
+                        .font(.geistMono(.subheadline, weight: .semibold))
+                        .monospacedDigit()
                         .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-                        .foregroundColor(future ? Color.SubtitleText : Color.PrimaryText)
+                        .foregroundStyle(future ? Color.vTertiary : Color.vText)
                         .minimumScaleFactor(0.7)
                         .lineLimit(1)
                         .layoutPriority(1)
                 }
             }
             .id(refreshID)
-            .padding(.vertical, 8)
+            .padding(.vertical, 6)
             .padding(.horizontal, 10)
             .contentShape(RoundedRectangle(cornerRadius: 10))
             .onTapGesture {
@@ -1464,27 +1472,20 @@ struct EmojiLogView: View {
     var body: some View {
         ZStack {
             if future {
-                RoundedRectangle(cornerRadius: 9, style: .continuous)
-                    .stroke(Color(hex: colour).opacity(0.73), lineWidth: 2)
+                RoundedRectangle(cornerRadius: huge ? 16 : 8, style: .continuous)
+                    .stroke(Color(hex: colour).opacity(0.5), lineWidth: 1)
                     .foregroundColor(.clear)
             } else {
-                RoundedRectangle(cornerRadius: huge ? 20 : 9, style: .continuous)
+                RoundedRectangle(cornerRadius: huge ? 16 : 8, style: .continuous)
                     .fill(blend(over: Color(hex: colour), withAlpha: 0.73))
-//                RoundedRectangle(cornerRadius: 9, style: .continuous)
-//                    .fill(Color.white)
-//
-//                RoundedRectangle(cornerRadius: 9, style: .continuous)
-//                    .fill(Color(hex: colour).opacity(0.73))
             }
 
             Text(emoji)
-                .font(.system(huge ? .title : .title3))
-                // future ? .caption :
+                .font(.system(huge ? .title : .callout))
                 .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                .padding(8)
-//                .font(.system(size: huge ? 45 : future ? 16: 20))
+                .padding(huge ? 8 : 6)
         }
-        .opacity(future ? 0.6 : 1)
+        .opacity(future ? 0.5 : 1)
     }
 
     init(emoji: String, colour: String, future: Bool, huge: Bool = false) {
@@ -1712,7 +1713,7 @@ struct FilteredDateView: View {
     @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
 
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
-    
+
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var showExpenseOrIncomeSign: Bool = true
 
