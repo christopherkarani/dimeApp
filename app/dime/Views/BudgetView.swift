@@ -2225,6 +2225,7 @@ struct AnimatedCurvedBarGraphBudget: View {
     var body: some View {
         DonutSemicircle(percent: percent, cornerRadius: cornerRadius, width: width)
             .fill(Color(color))
+            .shaderArcGlow(percent: percent)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
                     var holdingTotal = 0.0
@@ -2257,6 +2258,7 @@ struct AnimatedCurvedBarGraphMainBudget: View {
     var body: some View {
         DonutSemicircle(percent: percent, cornerRadius: cornerRadius, width: width)
             .fill(Color.DarkBackground)
+            .shaderArcGlow(percent: percent)
             .onAppear {
                 DispatchQueue.main.asyncAfter(deadline: .now()) {
                     var holdingTotal = 0.0
