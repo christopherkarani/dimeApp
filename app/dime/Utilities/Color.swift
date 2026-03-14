@@ -180,6 +180,31 @@ extension Color {
     static var EvenLighterText: Color {
         return Color("EvenLighterText")
     }
+
+    // MARK: - Vercel/Linear Theme (Adaptive)
+
+    private static func adaptive(light: String, dark: String) -> Color {
+        Color(UIColor { tc in
+            let hex = tc.userInterfaceStyle == .dark ? dark : light
+            let clean = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+            var int = UInt64()
+            Scanner(string: clean).scanHexInt64(&int)
+            let r = CGFloat((int >> 16) & 0xFF) / 255.0
+            let g = CGFloat((int >> 8) & 0xFF) / 255.0
+            let b = CGFloat(int & 0xFF) / 255.0
+            return UIColor(red: r, green: g, blue: b, alpha: 1.0)
+        })
+    }
+
+    static var vBg: Color { adaptive(light: "FFFFFF", dark: "09090B") }
+    static var vSurface: Color { adaptive(light: "F4F4F5", dark: "18181B") }
+    static var vBorder: Color { adaptive(light: "E4E4E7", dark: "27272A") }
+    static var vText: Color { adaptive(light: "09090B", dark: "FAFAFA") }
+    static var vSecondary: Color { adaptive(light: "52525B", dark: "A1A1AA") }
+    static var vTertiary: Color { adaptive(light: "71717A", dark: "71717A") }
+    static var vMuted: Color { adaptive(light: "E4E4E7", dark: "3F3F46") }
+    static var vGreen: Color { adaptive(light: "16A34A", dark: "22C55E") }
+    static var vRed: Color { adaptive(light: "DC2626", dark: "EF4444") }
 }
 
 public extension View {

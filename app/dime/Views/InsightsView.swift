@@ -44,21 +44,19 @@ struct InsightsView: View {
 
                 Text("Analyse Your Expenditure")
                     .font(.system(.title2, design: .rounded).weight(.medium))
-//                    .font(.system(size: 23.5, weight: .medium, design: .rounded))
-                    .foregroundColor(Color.PrimaryText.opacity(0.8))
+                    .foregroundColor(Color.vText.opacity(0.8))
                     .multilineTextAlignment(.center)
 
                 Text("As transactions start piling up")
                     .font(.system(.body, design: .rounded).weight(.medium))
-//                    .font(.system(size: 18, weight: .medium, design: .rounded))
-                    .foregroundColor(Color.SubtitleText.opacity(0.7))
+                    .foregroundColor(Color.vTertiary)
                     .multilineTextAlignment(.center)
             }
             .padding(.horizontal, 30)
             .frame(height: 250, alignment: .top)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .ignoresSafeArea(.all)
-            .background(Color.PrimaryBackground)
+            .background(Color.vBg)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
 
         } else {
@@ -66,6 +64,7 @@ struct InsightsView: View {
                 HStack {
                     Text("Insights")
                         .font(.system(.title, design: .rounded).weight(.semibold))
+                        .foregroundColor(Color.vText)
                         .accessibility(addTraits: .isHeader)
                     Spacer()
 
@@ -81,8 +80,9 @@ struct InsightsView: View {
                         }
                         .padding(3)
                         .padding(.horizontal, 6)
-                        .foregroundColor(Color.PrimaryText.opacity(0.9))
-                        .background(Color.Outline, in: RoundedRectangle(cornerRadius: 6))
+                        .foregroundColor(Color.vSecondary)
+                        .background(Color.vSurface, in: RoundedRectangle(cornerRadius: 6))
+                        .overlay(RoundedRectangle(cornerRadius: 6).stroke(Color.vBorder, lineWidth: 1))
                     }
                     .popover(present: $showTimeMenu, attributes: {
                         $0.position = .absolute(
@@ -113,7 +113,7 @@ struct InsightsView: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.PrimaryBackground)
+            .background(Color.vBg)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             .onReceive(self.didSave) { _ in
                 self.refreshID = UUID()
@@ -213,7 +213,7 @@ struct HorizontalPieChartView: View {
                 if !categoryFilterMode {
                     Text("Categories")
                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                     GeometryReader { proxy in
                         HStack(spacing: proxy.size.width * 0.015) {
@@ -242,7 +242,7 @@ struct HorizontalPieChartView: View {
                                         .overlay {
                                             if categoryFilterMode && categoryFilter == category.category {
                                                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                                    .stroke(Color.DarkBackground, lineWidth: 1.5)
+                                                    .stroke(Color.vText, lineWidth: 1.5)
                                             }
                                         }
                                 }
@@ -264,12 +264,12 @@ struct HorizontalPieChartView: View {
 
                                     Text(category.category.fullName)
                                         .font(.system(.title3, design: .rounded).weight(.semibold))
-                                        .foregroundColor(Color.PrimaryText)
+                                        .foregroundColor(Color.vText)
                                         .frame(maxWidth: .infinity, alignment: .leading)
 
                                     Text("\(currencySymbol)\(category.amount, specifier: (showCents && category.amount < 100) ? "%.2f" : "%.0f")")
                                         .font(.system(categoryFilterMode && categoryFilter == category.category ? .title3 : .body, design: .rounded).weight(.medium))
-                                        .foregroundColor(Color.SubtitleText)
+                                        .foregroundColor(Color.vTertiary)
                                         .lineLimit(1)
                                         .layoutPriority(1)
 
@@ -283,9 +283,9 @@ struct HorizontalPieChartView: View {
                                         } label: {
                                             Image(systemName: "xmark")
                                                 .font(.system(.footnote, design: .rounded).weight(.bold))
-                                                .foregroundColor(Color.SubtitleText)
+                                                .foregroundColor(Color.vTertiary)
                                                 .padding(5)
-                                                .background(Color.SecondaryBackground, in: Circle())
+                                                .background(Color.vSurface, in: Circle())
                                         }
 
                                     } else {
@@ -295,13 +295,14 @@ struct HorizontalPieChartView: View {
                                             .foregroundColor(boxColor)
                                             .padding(.vertical, 3)
                                             .frame(width: percentWidth)
-                                            .background(boxColor.opacity(0.23), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                            .background(boxColor.opacity(0.15), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                            .overlay(RoundedRectangle(cornerRadius: 8, style: .continuous).stroke(boxColor.opacity(0.3), lineWidth: 1))
                                     }
                                 }
                                 .padding(.vertical, categoryFilterMode && categoryFilter == category.category ? 10 : 5)
                                 .padding(.horizontal, categoryFilterMode && categoryFilter == category.category ? 10 : 0)
-                                .background(RoundedRectangle(cornerRadius: 12).fill(categoryFilterMode && categoryFilter == category.category ? Color.TertiaryBackground : Color.PrimaryBackground))
-                                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(categoryFilterMode && categoryFilter == category.category ? Color.Outline : Color.clear, lineWidth: 1.3))
+                                .background(RoundedRectangle(cornerRadius: 12).fill(categoryFilterMode && categoryFilter == category.category ? Color.vSurface : Color.vBg))
+                                .overlay(RoundedRectangle(cornerRadius: 12).strokeBorder(categoryFilterMode && categoryFilter == category.category ? Color.vBorder : Color.clear, lineWidth: 1))
                                 .fixedSize(horizontal: false, vertical: true)
                                 .contentShape(Rectangle())
                                 .drawingGroup()
@@ -460,10 +461,9 @@ struct FilteredDateInsightsView: View {
 
     @AppStorage("swapTimeLabel", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var swapTimeLabel: Bool = false
     @AppStorage("showCents", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime")) var showCents: Bool = true
-    
+
     @AppStorage("showExpenseOrIncomeSign", store: UserDefaults(suiteName: "group.com.rafaelsoh.dime"))
     var showExpenseOrIncomeSign: Bool = true
-
 
     var body: some View {
         VStack(spacing: 0) {
@@ -736,7 +736,7 @@ struct SingleGraphView: View {
                     Text(dateString)
                         .lineLimit(1)
                         .font(.system(.callout, design: .rounded).weight(.semibold))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
                         .layoutPriority(1)
 
                     HStack(spacing: 10) {
@@ -746,10 +746,11 @@ struct SingleGraphView: View {
                         if showPercentage {
                             Text(percentageDifference)
                                 .font(.system(.footnote, design: .rounded).weight(.medium))
-                                .foregroundColor(currentNet < lastNet ? Color.AlertRed : Color.IncomeGreen)
+                                .foregroundColor(currentNet < lastNet ? Color.vRed : Color.vGreen)
                                 .padding(3)
                                 .padding(.horizontal, 3)
-                                .background(currentNet < lastNet ? Color.AlertRed.opacity(0.23) : Color.IncomeGreen.opacity(0.23), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                                .background(currentNet < lastNet ? Color.vRed.opacity(0.15) : Color.vGreen.opacity(0.15), in: RoundedRectangle(cornerRadius: 6, style: .continuous))
+                                .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous).stroke(currentNet < lastNet ? Color.vRed.opacity(0.3) : Color.vGreen.opacity(0.3), lineWidth: 1))
                                 .opacity(currentNet == 0 || lastNet == 0 ? 0 : 1)
                                 .lineLimit(1)
                         }
@@ -762,8 +763,7 @@ struct SingleGraphView: View {
                         Text(selectedCategoryName)
                             .lineLimit(1)
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-//                            .font(.system(size: 14, weight: .semibold, design: .rounded))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundColor(Color.vTertiary)
 
                         InsightsDollarView(amount: selectedCategoryAmount, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
@@ -773,7 +773,7 @@ struct SingleGraphView: View {
                         Text(selectedDateString)
                             .lineLimit(1)
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundColor(Color.vTertiary)
                         InsightsDollarView(amount: selectedDateAmount, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
@@ -782,7 +782,7 @@ struct SingleGraphView: View {
                         Text(type == 3 ? (income ? "Income/Mth" : "Spent/Mth") : (income ? "Income/Day" : "Spent/Day"))
                             .lineLimit(1)
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundColor(Color.vTertiary)
                         InsightsDollarView(amount: incomeAverage, currencySymbol: currencySymbol, showCents: showCents)
                             .layoutPriority(1)
                     }
@@ -791,7 +791,7 @@ struct SingleGraphView: View {
                         Text(type == 3 ? "AVG/MTH" : "AVG/DAY")
                             .lineLimit(1)
                             .font(.system(.callout, design: .rounded).weight(.semibold))
-                            .foregroundColor(Color.SubtitleText)
+                            .foregroundColor(Color.vTertiary)
                         InsightsDollarView(amount: average, currencySymbol: currencySymbol, showCents: showCents, net: netPositive)
                             .layoutPriority(1)
                     }
@@ -1179,7 +1179,7 @@ struct AverageLineView: View {
             PencilView(text: getAverageText(average: average))
 
             Line()
-                .stroke(Color.SubtitleText, style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [5]))
+                .stroke(Color.vTertiary, style: StrokeStyle(lineWidth: 1, lineCap: .round, dash: [5]))
                 .frame(height: 1)
                 .frame(maxWidth: .infinity)
         }
@@ -1252,13 +1252,13 @@ struct SingleWeekBarGraphView: View {
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
                 }
                 .frame(height: barHeight)
                 .padding(.trailing, 3)
@@ -1269,7 +1269,7 @@ struct SingleWeekBarGraphView: View {
                         VStack(spacing: 5) {
                             ZStack(alignment: .bottom) {
                                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(Color.SecondaryBackground)
+                                    .fill(Color.vSurface)
                                     .frame(height: barHeight)
 
                                 AnimatedBarGraph(index: daysOfWeek.firstIndex(of: day) ?? 0)
@@ -1279,7 +1279,7 @@ struct SingleWeekBarGraphView: View {
 
                             Text(getWeekday(day: day).prefix(1))
                                 .font(.system(size: 12, weight: .bold, design: .rounded))
-                                .foregroundColor(Color.SubtitleText)
+                                .foregroundColor(Color.vTertiary)
                         }
                         .opacity(day > Date.now ? 0.3 : 1)
                         .frame(maxWidth: .infinity)
@@ -1545,7 +1545,7 @@ struct MonthGraphView: View {
                     categoryFilterMode = false
                 }
                 .padding(.bottom, incomeFiltering ? 5 : 20)
-                
+
                 Group {
                     if !incomeFiltering {
                         FilteredInsightsView(startDate: showingMonth, type: 2)
@@ -1634,13 +1634,13 @@ struct SingleMonthBarGraphView: View {
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                 }
                 .frame(height: barHeight)
@@ -1651,7 +1651,7 @@ struct SingleMonthBarGraphView: View {
                     ForEach(daysOfMonth, id: \.self) { day in
                         ZStack(alignment: .bottom) {
                             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .fill(Color.SecondaryBackground)
+                                .fill(Color.vSurface)
                                 .frame(height: barHeight)
                                 .zIndex(0)
 
@@ -1663,7 +1663,7 @@ struct SingleMonthBarGraphView: View {
                                     if numberArray.contains(((daysOfMonth.firstIndex(of: day) ?? -1) + 1)) && firstDayOfMonth == 1 {
                                         Text("\((daysOfMonth.firstIndex(of: day) ?? -1) + 1)")
                                             .font(.system(size: 12, weight: .bold, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundColor(Color.vTertiary)
                                             .frame(width: 20, alignment: .center)
                                             .offset(y: 20)
                                     }
@@ -1990,13 +1990,13 @@ struct SingleYearBarGraphView: View {
                 VStack(alignment: .leading) {
                     Text(getMaxText(maxi: getMax))
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                     Spacer()
 
                     Text("0")
                         .font(.system(size: 12, weight: .regular, design: .rounded))
-                        .foregroundColor(Color.SubtitleText)
+                        .foregroundColor(Color.vTertiary)
 
                 }
                 .frame(height: barHeight)
@@ -2007,7 +2007,7 @@ struct SingleYearBarGraphView: View {
                     ForEach(monthsOfYear, id: \.self) { month in
                         ZStack(alignment: .bottom) {
                             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                .fill(Color.SecondaryBackground)
+                                .fill(Color.vSurface)
                                 .frame(height: barHeight)
                                 .zIndex(0)
 
@@ -2019,7 +2019,7 @@ struct SingleYearBarGraphView: View {
                                     if numberArray.contains(((monthsOfYear.firstIndex(of: month) ?? 0) + 1)) {
                                         Text(LocalizedStringKey(monthNames[((monthsOfYear.firstIndex(of: month) ?? 0) + 1)] ?? ""))
                                             .font(.system(size: 12, weight: .bold, design: .rounded))
-                                            .foregroundColor(Color.SubtitleText)
+                                            .foregroundColor(Color.vTertiary)
                                             .frame(width: 30)
                                             .offset(y: 20)
                                     }
@@ -2141,7 +2141,7 @@ struct ChartTimePickerView: View {
                 .background {
                     if time == timeframe {
                         RoundedRectangle(cornerRadius: 6)
-                            .fill(darkMode ? Color("AlwaysDarkSecondaryBackground") : Color("AlwaysLightSecondaryBackground"))
+                            .fill(Color.vMuted)
                             .matchedGeometryEffect(id: "TAB", in: animation)
                     }
                 }
@@ -2161,11 +2161,11 @@ struct ChartTimePickerView: View {
                 }
             }
         }
-        .foregroundColor(darkMode ? Color("AlwaysLightBackground") : Color("AlwaysDarkBackground"))
+        .foregroundColor(Color.vText)
         .padding(4)
         .frame(width: 120)
-        .background(RoundedRectangle(cornerRadius: 9).fill(darkMode ? Color("AlwaysDarkBackground") : Color("AlwaysLightBackground")).shadow(color: darkMode ? Color.clear : Color.gray.opacity(0.25), radius: 6))
-        .overlay(RoundedRectangle(cornerRadius: 9).stroke(darkMode ? Color.gray.opacity(0.1) : Color.clear, lineWidth: 1.3))
+        .background(RoundedRectangle(cornerRadius: 9).fill(Color.vSurface))
+        .overlay(RoundedRectangle(cornerRadius: 9).stroke(Color.vBorder, lineWidth: 1))
         .onChange(of: timeframe) { _ in
             if timeframe == .week {
                 chartType = 1
@@ -2198,7 +2198,7 @@ struct AnimatedBarGraph: View {
             Spacer(minLength: 0)
 
             RoundedRectangle(cornerRadius: 6, style: .continuous)
-                .fill(Color.DarkBackground)
+                .fill(Color.vText)
                 .frame(height: showBar ? nil : 0, alignment: .bottom)
         }
         .onAppear {
@@ -2267,11 +2267,11 @@ struct InsightsDollarView: View {
             Group {
                 Text(symbol)
                     .font(.system(.title3, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.SubtitleText) +
+                    .foregroundColor(Color.vTertiary) +
 
                 Text("\(amount, specifier: showCents && amount < 100 ? "%.2f" : "%.0f")")
                     .font(.system(.title, design: .rounded).weight(.medium))
-                    .foregroundColor(Color.PrimaryText)
+                    .foregroundColor(Color.vText)
             }
         }
         .minimumScaleFactor(0.5)
@@ -2336,13 +2336,12 @@ struct SwipeArrowView: View {
                 .font(.system(.body, design: .rounded).weight(.medium))
 //                                        .font(.system(size: 18, weight: .medium))
                 //                                .scaleEffect(changeTime ? 1.3 : 1)
-                .foregroundColor(changeTime ? Color.PrimaryText : Color.SecondaryBackground)
+                .foregroundColor(changeTime ? Color.vText : Color.vMuted)
 
             Text(swipeString)
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .multilineTextAlignment(.center)
-                .foregroundColor(changeTime ? Color.PrimaryText : Color.SecondaryBackground)
+                .foregroundColor(changeTime ? Color.vText : Color.vMuted)
         }
         .drawingGroup()
     }
@@ -2355,15 +2354,13 @@ struct SwipeEndView: View {
         VStack(spacing: 8) {
             Image(systemName: left ? "eyeglasses" : "sun.haze.fill")
                 .font(.system(.title2, design: .rounded).weight(.medium))
-//                                        .font(.system(size: 22, weight: .medium))
-                .foregroundColor(Color.SubtitleText)
+                .foregroundColor(Color.vTertiary)
 
             Text(left ? "That's all, buddy." : "Into the unknown.")
                 .font(.system(.subheadline, design: .rounded).weight(.semibold))
-//                                        .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .frame(width: 90)
                 .multilineTextAlignment(.center)
-                .foregroundColor(Color.SubtitleText)
+                .foregroundColor(Color.vTertiary)
         }
         .opacity(0.8)
         .drawingGroup()

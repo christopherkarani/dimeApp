@@ -22,12 +22,12 @@ struct PencilView: View {
     var body: some View {
             ZStack(alignment: .leading) {
                 Pencil(flagLength: flagLength, offsetLength: 3, cornerRadius: 5)
-                    .fill(Color.SubtitleText)
+                    .fill(Color.vMuted)
                     .frame(width: width, height: 20)
 
                 Text(text)
                     .font(.system(size: fontSize, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.PrimaryText)
+                    .foregroundStyle(Color.vText)
                     .padding(.horizontal, horizontalPadding)
 
             }
