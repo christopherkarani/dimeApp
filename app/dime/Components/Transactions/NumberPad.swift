@@ -27,6 +27,7 @@ struct NumberPad: View {
     var numPadNumbers = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 
     @State private var engine: CHHapticEngine?
+    @State private var rippleTriggers: [Int: Int] = [:]
 
     var body: some View {
         GeometryReader { proxy in
@@ -209,6 +210,8 @@ struct NumberPad: View {
                     price += Double(number)
                 }
             }
+
+            rippleTriggers[number, default: 0] += 1
         } label: {
             Text("\(number)")
                 .font(.system(size: 34, weight: .regular, design: .rounded))
@@ -216,6 +219,11 @@ struct NumberPad: View {
                 .background(Color.SecondaryBackground)
                 .foregroundColor(Color.PrimaryText)
                 .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .shaderKeyRipple(
+                    at: CGPoint(x: size.width * 0.15, y: size.height * 0.11),
+                    trigger: rippleTriggers[number, default: 0],
+                    size: CGSize(width: size.width * 0.3, height: size.height * 0.22)
+                )
                 .opacity(disabled ? 0.6 : 1)
         }
         .disabled(disabled)
